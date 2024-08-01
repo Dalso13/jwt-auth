@@ -1,4 +1,4 @@
-import json
+
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
@@ -9,7 +9,6 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 from app.forms import UserForm
-from app.models import User
 from app.serializer import UserSerializer
 
 
@@ -29,7 +28,7 @@ def signUp(request):
         return Response({
             'refresh': str(refresh),
             'access': str(access),
-            'user' : UserSerializer(user).data
+            'user': UserSerializer(user).data
         }, status=status.HTTP_201_CREATED)
 
 
@@ -38,10 +37,10 @@ def login(request):
     if request.method == 'GET':
         return render(request, "app/login.html")
     if request.method == 'POST':
-        username = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(email=email, password=password)
         if user is None:
             return Response({'message': '아이디 또는 비밀번호가 일치하지 않습니다.'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -51,4 +50,3 @@ def login(request):
 
         return Response({'refresh_token': str(refresh),
                          'access_token': str(access), }, status=status.HTTP_200_OK)
-

@@ -11,4 +11,4 @@ class UserForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'phone', 'password']
+        fields = ['email', 'password', 'first_name', 'last_name']
