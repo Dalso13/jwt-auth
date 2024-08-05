@@ -43,7 +43,6 @@ ALLOWED_HOSTS = []
 
 # custom user 설정
 AUTH_USER_MODEL = "app.User"
-#AUTHENTICATION_BACKENDS = ["app.backends.EmailBackend"]
 
 SITE_ID = 1
 
@@ -56,8 +55,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.naver',
     'app',
 ]
 
@@ -69,6 +76,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'jwt_auth.urls'
@@ -91,7 +99,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'jwt_auth.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -108,8 +115,9 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+        "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ),
 }
 
 # Password validation
@@ -130,6 +138,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    "kakao": {
+        "SCOPE": ["profile_nickname"],
+        "AUTH_PARAMS": {"access_type": "online"},
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -153,7 +172,21 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-REST_USE_JWT = True
+REST_AUTH = {
+    'USE_JWT' : True,
+    'JWT_AUTH_COOKIE' : 'access',
+    'JWT_AUTH_HTTPONLY': True,
+    'JWT_AUTH_REFRESH_COOKIE' : "refresh_token",
+    'JWT_AUTH_SAMESITE': 'Lax',
+    'JWT_AUTH_COOKIE_USE_CSRF' : False,
+    'SESSION_LOGIN' : False
+}
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USERNAME_REQUIRED = False
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),

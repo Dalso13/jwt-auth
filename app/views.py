@@ -1,5 +1,4 @@
-
-
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from django.shortcuts import render
@@ -10,6 +9,10 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 from app.forms import UserForm
 from app.serializer import UserSerializer
+
+from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
+from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
+from dj_rest_auth.registration.views import SocialLoginView
 
 
 # Create your views here.
@@ -50,3 +53,14 @@ def login(request):
 
         return Response({'refresh_token': str(refresh),
                          'access_token': str(access), }, status=status.HTTP_200_OK)
+
+
+class KakaoLogin(SocialLoginView):
+    adapter_class = KakaoOAuth2Adapter
+    client_class = OAuth2Client
+
+
+class NaverLogin(SocialLoginView):
+    adapter_class = NaverOAuth2Adapter
+    client_class = OAuth2Client
+
